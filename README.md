@@ -1,2 +1,1 @@
-"# images_gdip"
-"# images_gdip"
+basic sprite-display utility using GDI+ and <vector>
