@@ -10,90 +10,69 @@
 //*****************************************************************
 
 #include <windows.h>
+#include <tchar.h>
 
-LRESULT CALLBACK WndProc (HWND, UINT, WPARAM, LPARAM);
+#include "gdi_plus.h"
+#include "gdiplus_setup.h"
 
-HINSTANCE g_hinst = 0;
+// HINSTANCE g_hinst = 0;
 char tempstr[128];
 
+static gdi_plus *pngSprites = NULL ;
+
 //*****************************************************************
-char *img_name = "array.36x36.bmp";
-static unsigned X_ELEMENTS = 4;
-static unsigned Y_ELEMENTS = 5;
-static const unsigned X_ELEMENT_SZ = 36;
-static const unsigned Y_ELEMENT_SZ = 36;
+static unsigned TILES_X = 40;
+static unsigned TILES_Y = 27;
+static unsigned SPRITE_WIDTH = 32;
+static unsigned SPRITE_HEIGHT = 32;
+static const unsigned X_ELEMENT_SZ = 32;
+static const unsigned Y_ELEMENT_SZ = 32;
 
-static const unsigned X_GAP_SZ = 42;
-static const unsigned Y_GAP_SZ = 42;
+static const unsigned X_OFFSET = 20 ;
+static const unsigned Y_OFFSET = 20 ;
 
+static const unsigned X_GAP_SZ = 10;
+static const unsigned Y_GAP_SZ = 10;
+
+//***********************************************************************
+// static char *sprite_img_name = "tiles32.jpg";
+static void draw_sprite(HDC hdc, unsigned scol, unsigned srow, unsigned xidest, unsigned yidest)
+{
+   unsigned xdest = X_OFFSET + (xidest * (SPRITE_WIDTH  + X_GAP_SZ)) ;  //  draw_sprite()
+   unsigned ydest = Y_OFFSET + (yidest * (SPRITE_HEIGHT + Y_GAP_SZ)) ;  //  draw_sprite()
+   pngSprites->render_bitmap(hdc, xdest, ydest, scol, srow) ;
+}
+
+//*****************************************************************
+static void OnPaint(HDC hdc)
+{
+   uint row, col ;
+   for (row=0; row<TILES_Y; row++) {
+      for (col=0; col<TILES_X; col++) {
+         draw_sprite(hdc, col, row, col, row);
+      }
+   }
+}
+      
+//*****************************************************************
 LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-   static HBITMAP hBitmap;
-   static int cxClient, cyClient;
-   BITMAP bitmap;
-   HDC hdc, hdcMem;
-   HINSTANCE hInstance;
+   HDC hdc;
    PAINTSTRUCT ps;
-   unsigned xsrc, xdest, xidx;
-   unsigned ysrc, ydest, yidx;
 
    switch (message) {
    case WM_CREATE:
-      hInstance = ((LPCREATESTRUCT) lParam)->hInstance;
-
-      // hBitmap = LoadBitmap (hInstance, TEXT ("Bricks")) ;
-      hBitmap = (HBITMAP) LoadImage (g_hinst, img_name, IMAGE_BITMAP, 0, 0,
-         LR_LOADFROMFILE | LR_CREATEDIBSECTION);
-      if (hBitmap == NULL) {
-         // wsprintf(tempstr, "LoadImage: %s", get_system_message()) ;
-         MessageBox (hwnd, "LoadImage failed", "status", MB_OK);
-      }
-
-      GetObject (hBitmap, sizeof (BITMAP), &bitmap);
-
-      // X_ELEMENT_SZ = bitmap.bmWidth ;
-      // Y_ELEMENT_SZ = bitmap.bmHeight ;
-      return 0;
-
-   case WM_SIZE:
-      cxClient = LOWORD (lParam);
-      cyClient = HIWORD (lParam);
+      // tiles32.png: image: 1280x960, tiles: 40x27, sprites: 32x32
+      pngSprites = new gdi_plus(_T("tiles32.png"), TILES_X, TILES_Y, SPRITE_WIDTH, SPRITE_HEIGHT, CACHED_CLONES_ENABLED) ;
       return 0;
 
    case WM_PAINT:
       hdc = BeginPaint (hwnd, &ps);
-
-      hdcMem = CreateCompatibleDC (hdc);
-      SelectObject (hdcMem, hBitmap);
-
-      ysrc = yidx = 0;
-      for (ydest = 0; ydest < (unsigned) cyClient; ydest += Y_GAP_SZ) {
-         xidx = xsrc = 0;
-         for (xdest = 0; xdest < (unsigned) cxClient; xdest += X_GAP_SZ) {
-            // BitBlt (hdc, x, y, X_ELEMENT_SZ, Y_ELEMENT_SZ, hdcMem, 0, 0, SRCCOPY) ;
-            BitBlt (hdc, xdest, ydest, X_ELEMENT_SZ, Y_ELEMENT_SZ, hdcMem,
-               xsrc, ysrc, SRCCOPY);
-
-            //  update offset
-            xsrc += X_ELEMENT_SZ;
-            if (++xidx == X_ELEMENTS) {
-               xidx = xsrc = 0;
-            }
-         }
-
-         //  update offset
-         ysrc += Y_ELEMENT_SZ;
-         if (++yidx == Y_ELEMENTS) {
-            yidx = ysrc = 0;
-         }
-      }
-
-      DeleteDC (hdcMem);
+      OnPaint(hdc);
       EndPaint (hwnd, &ps);
       return 0;
 
    case WM_DESTROY:
-      DeleteObject (hBitmap);
       PostQuitMessage (0);
       return 0;
    }
@@ -108,7 +87,9 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine
    MSG msg;
    WNDCLASS wndclass;
 
-   g_hinst = hInstance;
+   init_gdiplus_data() ;
+   
+   // g_hinst = hInstance;
    wndclass.style = CS_HREDRAW | CS_VREDRAW;
    wndclass.lpfnWndProc = WndProc;
    wndclass.cbClsExtra = 0;
@@ -116,7 +97,7 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine
    wndclass.hInstance = hInstance;
    wndclass.hIcon = LoadIcon (NULL, IDI_APPLICATION);
    wndclass.hCursor = LoadCursor (NULL, IDC_ARROW);
-   wndclass.hbrBackground = (HBRUSH) GetStockObject (WHITE_BRUSH);
+   wndclass.hbrBackground = (HBRUSH) GetStockObject (GRAY_BRUSH);
    wndclass.lpszMenuName = NULL;
    wndclass.lpszClassName = szAppName;
 
@@ -126,10 +107,12 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine
       return 0;
    }
 
-   hwnd = CreateWindow (szAppName, TEXT ("LoadBitmap Demo"),
-      WS_OVERLAPPEDWINDOW,
-      CW_USEDEFAULT, CW_USEDEFAULT,
-      CW_USEDEFAULT, CW_USEDEFAULT, NULL, NULL, hInstance, NULL);
+   hwnd = CreateWindow (szAppName, TEXT ("images"), WS_OVERLAPPEDWINDOW,
+      300,     // initial x position
+      100,     // initial y position
+      1750,    // initial x size
+      1200,    // initial y size
+      NULL, NULL, hInstance, NULL);
 
    ShowWindow (hwnd, iCmdShow);
    UpdateWindow (hwnd);
@@ -138,6 +121,6 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine
       TranslateMessage (&msg);
       DispatchMessage (&msg);
    }
+   release_gdiplus_data();
    return msg.wParam;
 }
-
