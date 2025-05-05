@@ -15,24 +15,21 @@
 #include "gdi_plus.h"
 #include "gdiplus_setup.h"
 
-// HINSTANCE g_hinst = 0;
-char tempstr[128];
-
 static gdi_plus *pngSprites = NULL ;
 
 //*****************************************************************
-static unsigned TILES_X = 40;
-static unsigned TILES_Y = 27;
-static unsigned SPRITE_WIDTH = 32;
-static unsigned SPRITE_HEIGHT = 32;
-static const unsigned X_ELEMENT_SZ = 32;
-static const unsigned Y_ELEMENT_SZ = 32;
+static unsigned const TILES_X = 40;
+static unsigned const TILES_Y = 27;
+static unsigned const SPRITE_WIDTH = 32;
+static unsigned const SPRITE_HEIGHT = 32;
+// static const unsigned X_ELEMENT_SZ = 32;
+// static const unsigned Y_ELEMENT_SZ = 32;
 
-static const unsigned X_OFFSET = 20 ;
-static const unsigned Y_OFFSET = 20 ;
+static unsigned const X_OFFSET = 20 ;
+static unsigned const Y_OFFSET = 20 ;
 
-static const unsigned X_GAP_SZ = 10;
-static const unsigned Y_GAP_SZ = 10;
+static unsigned const X_GAP_SZ = 10;
+static unsigned const Y_GAP_SZ = 10;
 
 //***********************************************************************
 // static char *sprite_img_name = "tiles32.jpg";
@@ -55,7 +52,7 @@ static void OnPaint(HDC hdc)
 }
       
 //*****************************************************************
-LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
+static LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
    HDC hdc;
    PAINTSTRUCT ps;
@@ -63,7 +60,7 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
    switch (message) {
    case WM_CREATE:
       // tiles32.png: image: 1280x960, tiles: 40x27, sprites: 32x32
-      pngSprites = new gdi_plus(_T("tiles32.png"), TILES_X, TILES_Y, SPRITE_WIDTH, SPRITE_HEIGHT, CACHED_CLONES_ENABLED) ;
+      pngSprites = new gdi_plus(_T("tiles32.png"), TILES_X, TILES_Y, SPRITE_WIDTH, SPRITE_HEIGHT, CACHED_CLONES_DISABLED) ;
       return 0;
 
    case WM_PAINT:
@@ -75,6 +72,9 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
    case WM_DESTROY:
       PostQuitMessage (0);
       return 0;
+      
+   default:
+      break ;
    }
    return DefWindowProc (hwnd, message, wParam, lParam);
 }
@@ -82,7 +82,7 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 //*****************************************************************
 int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine, int iCmdShow)
 {
-   static TCHAR szAppName[] = TEXT ("sprites");
+   static TCHAR const szAppName[] = TEXT ("sprites");
    HWND hwnd;
    MSG msg;
    WNDCLASS wndclass;
@@ -123,4 +123,4 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine
    }
    release_gdiplus_data();
    return msg.wParam;
-}
+}  //lint !e715
