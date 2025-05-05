@@ -60,7 +60,7 @@ static LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM 
    switch (message) {
    case WM_CREATE:
       // tiles32.png: image: 1280x960, tiles: 40x27, sprites: 32x32
-      pngSprites = new gdi_plus(_T("tiles32.png"), TILES_X, TILES_Y, SPRITE_WIDTH, SPRITE_HEIGHT, CACHED_CLONES_DISABLED) ;
+      pngSprites = new gdi_plus(_T("tiles32.png"), TILES_X, TILES_Y, SPRITE_WIDTH, SPRITE_HEIGHT) ;
       return 0;
 
    case WM_PAINT:
