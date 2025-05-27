@@ -52,6 +52,16 @@ der_libs/winmsgs.cpp
 CBASE=images.cpp
 CSRC += $(CBASE)
 
+#  clang-tidy options
+CHFLAGS = -header-filter=.*
+CHTAIL = -- -Ider_libs
+ifeq ($(USE_64BIT),YES)
+CHTAIL += -DUSE_64BIT
+endif
+ifeq ($(USE_UNICODE),YES)
+CHTAIL += -DUNICODE -D_UNICODE
+endif
+
 # iface_lib.cpp 
 
 OBJS = $(CSRC:.cpp=.o)
@@ -75,7 +85,7 @@ wc:
 	wc -l $(CBASE) *.rc
 	
 check:
-	cmd /C "d:\clang\bin\clang-tidy.exe -header-filter=.* $(CSRC) -- -Ider_libs -DUNICODE -D_UNICODE "
+	cmd /C "d:\clang\bin\clang-tidy.exe $(CHFLAGS) $(CSRC) $(CHTAIL)"
 
 lint:
 	cmd /C "c:\lint9\lint-nt +v -width(160,4) $(LiFLAGS) -ic:\lint9 mingw.lnt -os(_lint.tmp) lintdefs.cpp $(CSRC)"
