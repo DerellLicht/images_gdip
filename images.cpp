@@ -11,19 +11,22 @@
 
 #include <windows.h>
 #include <tchar.h>
+#include <memory>
 
 #include "gdi_plus.h"
 #include "gdiplus_setup.h"
 
+#ifdef _lint
 static gdi_plus *pngSprites = NULL ;
+#else
+static std::unique_ptr<gdi_plus> pngSprites ;
+#endif
 
 //*****************************************************************
 static unsigned const TILES_X = 40;
 static unsigned const TILES_Y = 27;
 static unsigned const SPRITE_WIDTH = 32;
 static unsigned const SPRITE_HEIGHT = 32;
-// static const unsigned X_ELEMENT_SZ = 32;
-// static const unsigned Y_ELEMENT_SZ = 32;
 
 static unsigned const X_OFFSET = 20 ;
 static unsigned const Y_OFFSET = 20 ;
@@ -60,7 +63,11 @@ static LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM 
    switch (message) {
    case WM_CREATE:
       // tiles32.png: image: 1280x960, tiles: 40x27, sprites: 32x32
+#ifdef _lint
       pngSprites = new gdi_plus(_T("tiles32.png"), TILES_X, TILES_Y, SPRITE_WIDTH, SPRITE_HEIGHT) ;
+#else      
+      pngSprites = std::make_unique<gdi_plus>(L"tiles32.png", TILES_X, TILES_Y, SPRITE_WIDTH, SPRITE_HEIGHT) ;
+#endif      
       return 0;
 
    case WM_PAINT:

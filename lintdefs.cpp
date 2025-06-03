@@ -9,4 +9,7 @@
 
 //  issues resulting from lack of support for C++11 and later
 //lint -e1087  Previous declaration is incompatible with something which was introduced by the current using-declaration
+//lint -e1054  template variable declaration expects a type, int assumed
+//lint -e1062  template must be either a class or a function
+
 
