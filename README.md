@@ -1,1 +1,1 @@
-basic sprite-display utility using GDI+ and <vector>
+basic sprite-display utility using GDI+ and unique_ptr
