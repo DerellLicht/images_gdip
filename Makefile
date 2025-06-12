@@ -10,7 +10,7 @@ TOOLS=d:\tdm64\bin
 else
 #TOOLS=c:\mingw\bin
 #TOOLS=c:\TDM-GCC-64\bin
-TOOLS=c:\tdm32\bin
+TOOLS=d:\tdm32\bin
 endif
 
 #*****************************************************************************
