@@ -4,14 +4,11 @@ USE_BMP = NO
 USE_PNG = NO
 USE_UNICODE = YES
 USE_64BIT = NO
+USE_CLANG = NO
+# sadly, cygwin mingw does not support gdiplus...
+USE_CYGWIN = NO
 
-ifeq ($(USE_64BIT),YES)
-TOOLS=d:\tdm64\bin
-else
-#TOOLS=c:\mingw\bin
-#TOOLS=c:\TDM-GCC-64\bin
-TOOLS=d:\tdm32\bin
-endif
+include ..\tool_select.mak 
 
 #*****************************************************************************
 # notes on compiler quirks, using MinGW/G++ V4.3.3
@@ -52,16 +49,6 @@ der_libs/winmsgs.cpp
 CBASE=images.cpp
 CSRC += $(CBASE)
 
-#  clang-tidy options
-CHFLAGS = -header-filter=.*
-CHTAIL = -- -Ider_libs
-ifeq ($(USE_64BIT),YES)
-CHTAIL += -DUSE_64BIT
-endif
-ifeq ($(USE_UNICODE),YES)
-CHTAIL += -DUNICODE -D_UNICODE
-endif
-
 LINTFILES=lintdefs.cpp lintdefs.ref.h 
 
 OBJS = $(CSRC:.cpp=.o)
@@ -79,13 +66,19 @@ LIBS= -lgdi32 -lgdiplus
 all: $(BIN)
 
 clean:
-	rm -vf $(BIN) $(OBJS) *.zip *.bak *~
+	rm -vf $(BIN) $(OBJS) *.zip 
 
 wc:
 	wc -l $(CBASE) *.rc
 	
+clint:
+	cmd /C "python ..\ClaudeLint.py --exclude der_libs"
+	
+cppc:
+	cmd /C "cppcheck --project=compile_commands.json --std=c++14 --suppressions-list=./.suppress.cppcheck"
+
 check:
-	cmd /C "d:\llvm\bin\clang-tidy.exe $(CHFLAGS) $(CSRC) $(CHTAIL)"
+	cmd /C "d:\llvm\bin\clang-tidy.exe $(CSRC)"
 
 lint:
 	cmd /C "c:\lint9\lint-nt +v -width(160,4) $(LiFLAGS) -ic:\lint9 mingw.lnt -os(_lint.tmp) $(LINTFILES) $(CSRC)"
