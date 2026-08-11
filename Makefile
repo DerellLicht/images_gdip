@@ -8,7 +8,7 @@ USE_CLANG = NO
 # sadly, cygwin mingw does not support gdiplus...
 USE_CYGWIN = NO
 
-include ..\tool_select.mak 
+include der_libs\tool_select.mak
 
 #*****************************************************************************
 # notes on compiler quirks, using MinGW/G++ V4.3.3
