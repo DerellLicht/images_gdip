@@ -14,7 +14,7 @@ ifeq ($(USE_DEBUG),YES)
 CFLAGS=-Wall -O -g
 LFLAGS= -mwindows 
 else
-CFLAGS=-Wall -O2 -c -Wreorder
+CFLAGS=-Wall -O2 -c
 LFLAGS=-s -mwindows 
 endif
 CFLAGS += -Wno-write-strings
