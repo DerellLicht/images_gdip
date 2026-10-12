@@ -10,32 +10,21 @@ USE_CYGWIN = NO
 include der_libs\tool_select.mak
 
 #*****************************************************************************
-# notes on compiler quirks, using MinGW/G++ V4.3.3
-# if I build with -O3, I get following warnings from g++ :
-#   wfuncs.cpp: In function 'int light_a_flare(HWND__*)':
-#   wfuncs.cpp:338: warning: array subscript is above array bounds
-# where light_a_flare() starts at line 779 !!
-# If I build with -O2, I get no such warnings.
-# In either case, PcLint V9 is giving no warnings on this code.
-#*****************************************************************************
-
 ifeq ($(USE_DEBUG),YES)
-CFLAGS=-Wall -O -g -mwindows 
-LFLAGS=
+CFLAGS=-Wall -O -g
+LFLAGS= -mwindows 
 else
-CFLAGS=-Wall -O2 -mwindows 
-LFLAGS=-s
+CFLAGS=-Wall -O2 -c -Wreorder
+LFLAGS=-s -mwindows 
 endif
 CFLAGS += -Wno-write-strings
 
 ifeq ($(USE_UNICODE),YES)
 CFLAGS += -DUNICODE -D_UNICODE
 LFLAGS += -dUNICODE -d_UNICODE
-LiFLAGS += -DUNICODE -D_UNICODE
 endif
 
 # link library files
-LiFLAGS += -Ider_libs
 CFLAGS += -Ider_libs
 CSRC=der_libs/common_funcs.cpp \
 der_libs/gdi_plus.cpp \
@@ -57,7 +46,7 @@ LIBS= -lgdi32 -lgdiplus
 
 #************************************************************
 %.o: %.cpp
-	$(TOOLS)\g++ $(CFLAGS) -c $< -o $@
+	$(TOOLS)\$(GNAME) $(CFLAGS) $< -o $@
 
 #************************************************************
 all: $(BIN)
@@ -81,7 +70,7 @@ depend:
 	makedepend $(CFLAGS) $(CSRC)
 
 $(BIN): $(OBJS)
-	$(TOOLS)\g++ $(CFLAGS) $(LFLAGS) $(OBJS) -o $@ $(LIBS)
+	$(TOOLS)/$(GNAME) $(OBJS) $(LFLAGS) -o $(BIN) $(LIBS) 
 
 # DO NOT DELETE
 

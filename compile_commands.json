@@ -1,0 +1,104 @@
+[
+ {
+  "directory": "D:\\SourceCode\\Git\\images_gdip",
+  "arguments": [
+   "d:/llvm/bin/i686-w64-mingw32-clang++",
+   "-Wall",
+   "-O2",
+   "-c",
+   "-Wno-write-strings",
+   "-DUNICODE",
+   "-D_UNICODE",
+   "-Ider_libs",
+   "der_libs/common_funcs.cpp",
+   "-o",
+   "der_libs/common_funcs.o"
+  ],
+  "file": "der_libs/common_funcs.cpp"
+ },
+ {
+  "directory": "D:\\SourceCode\\Git\\images_gdip",
+  "arguments": [
+   "d:/llvm/bin/i686-w64-mingw32-clang++",
+   "-Wall",
+   "-O2",
+   "-c",
+   "-Wno-write-strings",
+   "-DUNICODE",
+   "-D_UNICODE",
+   "-Ider_libs",
+   "der_libs/gdi_plus.cpp",
+   "-o",
+   "der_libs/gdi_plus.o"
+  ],
+  "file": "der_libs/gdi_plus.cpp"
+ },
+ {
+  "directory": "D:\\SourceCode\\Git\\images_gdip",
+  "arguments": [
+   "d:/llvm/bin/i686-w64-mingw32-clang++",
+   "-Wall",
+   "-O2",
+   "-c",
+   "-Wno-write-strings",
+   "-DUNICODE",
+   "-D_UNICODE",
+   "-Ider_libs",
+   "der_libs/gdiplus_setup.cpp",
+   "-o",
+   "der_libs/gdiplus_setup.o"
+  ],
+  "file": "der_libs/gdiplus_setup.cpp"
+ },
+ {
+  "directory": "D:\\SourceCode\\Git\\images_gdip",
+  "arguments": [
+   "d:/llvm/bin/i686-w64-mingw32-clang++",
+   "-Wall",
+   "-O2",
+   "-c",
+   "-Wno-write-strings",
+   "-DUNICODE",
+   "-D_UNICODE",
+   "-Ider_libs",
+   "der_libs/common_win.cpp",
+   "-o",
+   "der_libs/common_win.o"
+  ],
+  "file": "der_libs/common_win.cpp"
+ },
+ {
+  "directory": "D:\\SourceCode\\Git\\images_gdip",
+  "arguments": [
+   "d:/llvm/bin/i686-w64-mingw32-clang++",
+   "-Wall",
+   "-O2",
+   "-c",
+   "-Wno-write-strings",
+   "-DUNICODE",
+   "-D_UNICODE",
+   "-Ider_libs",
+   "der_libs/winmsgs.cpp",
+   "-o",
+   "der_libs/winmsgs.o"
+  ],
+  "file": "der_libs/winmsgs.cpp"
+ },
+ {
+  "directory": "D:\\SourceCode\\Git\\images_gdip",
+  "arguments": [
+   "d:/llvm/bin/i686-w64-mingw32-clang++",
+   "-Wall",
+   "-O2",
+   "-c",
+   "-Wno-write-strings",
+   "-DUNICODE",
+   "-D_UNICODE",
+   "-Ider_libs",
+   "images.cpp",
+   "-o",
+   "images.o"
+  ],
+  "file": "images.cpp"
+ }
+]
