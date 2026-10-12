@@ -13,6 +13,7 @@
 #include <tchar.h>
 #include <memory>
 
+#include "common.h"
 #include "gdi_plus.h"
 #include "gdiplus_setup.h"
 
@@ -55,6 +56,8 @@ static void OnPaint(HDC hdc)
 }
       
 //*****************************************************************
+static TCHAR image_name[MAX_PATH_LEN+1] = _T("") ;
+
 static LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
    HDC hdc;
@@ -63,11 +66,8 @@ static LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM 
    switch (message) {
    case WM_CREATE:
       // tiles32.png: image: 1280x960, tiles: 40x27, sprites: 32x32
-#ifdef _lint
-      pngSprites = new gdi_plus(_T("tiles32.png"), TILES_X, TILES_Y, SPRITE_WIDTH, SPRITE_HEIGHT) ;
-#else      
-      pngSprites = std::make_unique<gdi_plus>(L"tiles32.png", TILES_X, TILES_Y, SPRITE_WIDTH, SPRITE_HEIGHT) ;
-#endif      
+      // pngSprites = std::make_unique<gdi_plus>(L"tiles32.png", TILES_X, TILES_Y, SPRITE_WIDTH, SPRITE_HEIGHT) ;
+      pngSprites = std::make_unique<gdi_plus>(image_name, TILES_X, TILES_Y, SPRITE_WIDTH, SPRITE_HEIGHT) ;
       return 0;
 
    case WM_PAINT:
@@ -94,7 +94,15 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR szCmdLine
    MSG msg;
    WNDCLASS wndclass;
 
+   load_exec_filename() ;  //  get our executable name
+   // LRESULT result = derive_filename_from_exec(image_name, (TCHAR *) _T(".ini")) ;
+   LRESULT result = derive_file_path(image_name, L"tiles32.png");
+   if (result != 0) {
+      // return result;
+      _stprintf(image_name, _T(".\\tiles32.png"));
+   }
    init_gdiplus_data() ;
+   // syslog(L"%s\n", image_name);
    
    // g_hinst = hInstance;
    wndclass.style = CS_HREDRAW | CS_VREDRAW;

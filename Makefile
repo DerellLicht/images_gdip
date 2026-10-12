@@ -23,7 +23,7 @@ ifeq ($(USE_DEBUG),YES)
 CFLAGS=-Wall -O -g -mwindows 
 LFLAGS=
 else
-CFLAGS=-Wall -O2 -mwindows -Weffc++ 
+CFLAGS=-Wall -O2 -mwindows 
 LFLAGS=-s
 endif
 CFLAGS += -Wno-write-strings
@@ -47,8 +47,6 @@ der_libs/winmsgs.cpp
 # so that wc operation is more appropriate.
 CBASE=images.cpp
 CSRC += $(CBASE)
-
-LINTFILES=lintdefs.cpp lintdefs.ref.h 
 
 OBJS = $(CSRC:.cpp=.o)
 
@@ -79,11 +77,9 @@ cppc:
 check:
 	cmd /C "d:\llvm\bin\clang-tidy.exe $(CSRC)"
 
-lint:
-	cmd /C "c:\lint9\lint-nt +v -width(160,4) $(LiFLAGS) -ic:\lint9 mingw.lnt -os(_lint.tmp) $(LINTFILES) $(CSRC)"
-
 depend:
 	makedepend $(CFLAGS) $(CSRC)
+
 $(BIN): $(OBJS)
 	$(TOOLS)\g++ $(CFLAGS) $(LFLAGS) $(OBJS) -o $@ $(LIBS)
 
@@ -93,4 +89,4 @@ der_libs/common_funcs.o: der_libs/common.h
 der_libs/gdi_plus.o: der_libs/common.h der_libs/gdi_plus.h
 der_libs/gdiplus_setup.o: der_libs/gdi_plus.h
 der_libs/common_win.o: der_libs/common.h der_libs/commonw.h
-images.o: der_libs/gdi_plus.h der_libs/gdiplus_setup.h
+images.o: der_libs/common.h der_libs/gdi_plus.h der_libs/gdiplus_setup.h
