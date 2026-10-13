@@ -30,8 +30,7 @@ CSRC=images.cpp
 CSRC+=der_libs/common_funcs.cpp \
 der_libs/gdi_plus.cpp \
 der_libs/gdiplus_setup.cpp \
-der_libs/common_win.cpp \
-der_libs/winmsgs.cpp 
+der_libs/common_win.cpp 
 
 OBJS = $(CSRC:.cpp=.o)
 
@@ -70,8 +69,8 @@ $(BIN): $(OBJS)
 
 # DO NOT DELETE
 
+images.o: der_libs/common.h der_libs/gdi_plus.h der_libs/gdiplus_setup.h
 der_libs/common_funcs.o: der_libs/common.h
 der_libs/gdi_plus.o: der_libs/common.h der_libs/gdi_plus.h
 der_libs/gdiplus_setup.o: der_libs/gdi_plus.h
 der_libs/common_win.o: der_libs/common.h der_libs/commonw.h
-images.o: der_libs/common.h der_libs/gdi_plus.h der_libs/gdiplus_setup.h
