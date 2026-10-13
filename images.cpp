@@ -35,6 +35,9 @@ static unsigned const Y_OFFSET = 20 ;
 static unsigned const X_GAP_SZ = 10;
 static unsigned const Y_GAP_SZ = 10;
 
+static uint dx_offset = SPRITE_WIDTH  + X_GAP_SZ ;
+static uint dy_offset = SPRITE_HEIGHT + Y_GAP_SZ ;
+   
 //*****************************************************************
 static DrawMode draw_mode = DrawMode::BitBlt ;
 
@@ -65,8 +68,6 @@ static DrawMode next_mode(DrawMode mode)
 //  Mode BitBlt: one memory DC created and destroyed per sprite
 static void paint_bitblt(HDC hdc)
 {
-   uint dx_offset = SPRITE_WIDTH  + X_GAP_SZ ;
-   uint dy_offset = SPRITE_HEIGHT + Y_GAP_SZ ;
    uint ydest = Y_OFFSET ;
    for (uint row=0; row<TILES_Y; row++) {
       uint xdest = X_OFFSET ;
@@ -89,8 +90,6 @@ static void paint_batch(HDC hdc)
    if (!pngSprites->begin_batch(hdc)) {
       return;
    }
-   uint dx_offset = SPRITE_WIDTH  + X_GAP_SZ ;
-   uint dy_offset = SPRITE_HEIGHT + Y_GAP_SZ ;
    uint ydest = Y_OFFSET ;
    for (uint row=0; row<TILES_Y; row++) {
       uint xdest = X_OFFSET ;
@@ -113,8 +112,6 @@ static void paint_batch(HDC hdc)
 //*****************************************************************
 static void draw_matrix_gp(Gdiplus::Graphics &graphics)
 {
-   uint dx_offset = SPRITE_WIDTH  + X_GAP_SZ ;
-   uint dy_offset = SPRITE_HEIGHT + Y_GAP_SZ ;
    uint ydest = Y_OFFSET ;
    for (uint row=0; row<TILES_Y; row++) {
       uint xdest = X_OFFSET ;
