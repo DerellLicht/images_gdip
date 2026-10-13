@@ -139,27 +139,17 @@ static void paint_gdiplus(HDC hdc)
 //*****************************************************************
 //####  case DrawMode::GdiPlusOffscreen: 
 //*****************************************************************
-
 //*****************************************************************
-static unsigned sprite_x(unsigned col)
-{
-   return X_OFFSET + (col * (SPRITE_WIDTH + X_GAP_SZ)) ;
-}
-
-//*****************************************************************
-static unsigned sprite_y(unsigned row)
-{
-   return Y_OFFSET + (row * (SPRITE_HEIGHT + Y_GAP_SZ)) ;
-}
-
-//*****************************************************************
-//  Mode GdiPlusOffscreen: render the matrix into a PRE_ARGB bitmap, then
-//  put it on screen with one DrawImage.  The bitmap is rebuilt on every
-//  paint, so the timing includes the render, not just the final blit.
+//  Mode GdiPlusOffscreen: 
+//  render the matrix into a PRE_ARGB bitmap, 
+//  then put it on screen with one DrawImage.  
+//  The bitmap is rebuilt on every paint, 
+//  so the timing includes the render, not just the final blit.
 static void paint_offscreen(HDC hdc)
 {
-   INT const width  = (INT) sprite_x(TILES_X) ;
-   INT const height = (INT) sprite_y(TILES_Y) ;
+   //  compute dimensions of drawing region
+   INT const width  = (INT) X_OFFSET + (TILES_X * dx_offset) ;
+   INT const height = (INT) Y_OFFSET + (TILES_Y * dy_offset) ;
    Gdiplus::Bitmap canvas(width, height, PIXFMT_PRE_ARGB);
    {
       //  scoped so the offscreen Graphics is released before canvas is used
