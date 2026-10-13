@@ -1,9 +1,5 @@
 //*****************************************************************
 //  images.cpp - draw individual elements from a sprite array
-//  
-//  Written by:   Daniel D. Miller
-//  
-//  compile:   gcc -Wall -s -O3 images.cpp -o images.exe -lgdi32
 //*****************************************************************
 //  Based upon BRICKS1.C -- LoadBitmap Demonstration
 //                          (c) Charles Petzold, 1998
@@ -62,10 +58,9 @@ static DrawMode next_mode(DrawMode mode)
 
 //*****************************************************************
 //####   case DrawMode::BitBlt:
-//*****************************************************************
-
-//*****************************************************************
+//
 //  Mode BitBlt: one memory DC created and destroyed per sprite
+//*****************************************************************
 static void paint_bitblt(HDC hdc)
 {
    uint ydest = Y_OFFSET ;
@@ -81,10 +76,9 @@ static void paint_bitblt(HDC hdc)
 
 //*****************************************************************
 //####   case DrawMode::BatchBlt:
-//*****************************************************************
-
-//*****************************************************************
+//
 //  Mode BatchBlt: one memory DC for the whole matrix
+//*****************************************************************
 static void paint_batch(HDC hdc)
 {
    if (!pngSprites->begin_batch(hdc)) {
@@ -125,10 +119,9 @@ static void draw_matrix_gp(Gdiplus::Graphics &graphics)
 
 //*****************************************************************
 //####  case DrawMode::GdiPlus:
-//*****************************************************************
-
-//*****************************************************************
+//
 //  Mode GdiPlus: DrawImage straight to the window
+//*****************************************************************
 static void paint_gdiplus(HDC hdc)
 {
    Gdiplus::Graphics graphics(hdc);
@@ -138,13 +131,13 @@ static void paint_gdiplus(HDC hdc)
 
 //*****************************************************************
 //####  case DrawMode::GdiPlusOffscreen: 
-//*****************************************************************
-//*****************************************************************
+//
 //  Mode GdiPlusOffscreen: 
 //  render the matrix into a PRE_ARGB bitmap, 
 //  then put it on screen with one DrawImage.  
 //  The bitmap is rebuilt on every paint, 
 //  so the timing includes the render, not just the final blit.
+//*****************************************************************
 static void paint_offscreen(HDC hdc)
 {
    //  compute dimensions of drawing region
@@ -198,7 +191,7 @@ static LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM 
       u64 ms = (proc_time () - ti) / get_clocks_per_msec () ;
       TCHAR title[80];
       //  %ls (not %s) so the string argument is wide under any stdio mode
-      _stprintf(title, _T("images - %ls: %u ms (G cycles)"), mode_name(draw_mode), ms);
+      _stprintf(title, _T("images - %ls: %u ms (G cycles)"), mode_name(draw_mode), (uint) ms);
       SetWindowText(hwnd, title);
       }
       return 0;
