@@ -26,16 +26,12 @@ endif
 
 # link library files
 CFLAGS += -Ider_libs
-CSRC=der_libs/common_funcs.cpp \
+CSRC=images.cpp
+CSRC+=der_libs/common_funcs.cpp \
 der_libs/gdi_plus.cpp \
 der_libs/gdiplus_setup.cpp \
 der_libs/common_win.cpp \
 der_libs/winmsgs.cpp 
-
-# separate local source files from library files,
-# so that wc operation is more appropriate.
-CBASE=images.cpp
-CSRC += $(CBASE)
 
 OBJS = $(CSRC:.cpp=.o)
 
@@ -55,7 +51,7 @@ clean:
 	rm -vf $(BIN) $(OBJS) *.zip 
 
 wc:
-	wc -l $(CBASE) *.rc
+	wc -l $(CSRC)
 	
 clint:
 	cmd /C "python ..\ClaudeLint.py --exclude der_libs"

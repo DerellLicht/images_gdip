@@ -35,25 +35,7 @@ static unsigned const Y_OFFSET = 20 ;
 static unsigned const X_GAP_SZ = 10;
 static unsigned const Y_GAP_SZ = 10;
 
-//***********************************************************************
-// static char *sprite_img_name = "tiles32.jpg";
-static void draw_sprite(HDC hdc, unsigned scol, unsigned srow, unsigned xidest, unsigned yidest)
-{
-   unsigned xdest = X_OFFSET + (xidest * (SPRITE_WIDTH  + X_GAP_SZ)) ;  //  draw_sprite()
-   unsigned ydest = Y_OFFSET + (yidest * (SPRITE_HEIGHT + Y_GAP_SZ)) ;  //  draw_sprite()
-   pngSprites->render_bitmap(hdc, xdest, ydest, scol, srow) ;
-}
-
 //*****************************************************************
-//  Drawing techniques being compared; 'G' cycles through them
-enum class DrawMode {
-   BitBlt,            //  GDI BitBlt, memory DC created per sprite
-   BatchBlt,          //  GDI BitBlt, one memory DC per paint
-   GdiPlus,           //  GDI+ DrawImage straight to the window
-   GdiPlusOffscreen,  //  GDI+ DrawImage into a bitmap, then one blit
-   Count              //  number of modes; keep last
-};
-
 static DrawMode draw_mode = DrawMode::BitBlt ;
 
 //*****************************************************************
@@ -76,6 +58,92 @@ static DrawMode next_mode(DrawMode mode)
 }
 
 //*****************************************************************
+//####   case DrawMode::BitBlt:
+//*****************************************************************
+
+//*****************************************************************
+//  Mode BitBlt: one memory DC created and destroyed per sprite
+static void paint_bitblt(HDC hdc)
+{
+   uint dx_offset = SPRITE_WIDTH  + X_GAP_SZ ;
+   uint dy_offset = SPRITE_HEIGHT + Y_GAP_SZ ;
+   uint ydest = Y_OFFSET ;
+   for (uint row=0; row<TILES_Y; row++) {
+      uint xdest = X_OFFSET ;
+      for (uint col=0; col<TILES_X; col++) {
+         pngSprites->render_bitmap(hdc, xdest, ydest, col, row) ;
+         xdest += dx_offset ;
+      }
+      ydest += dy_offset ;
+   }
+}
+
+//*****************************************************************
+//####   case DrawMode::BatchBlt:
+//*****************************************************************
+
+//*****************************************************************
+//  Mode BatchBlt: one memory DC for the whole matrix
+static void paint_batch(HDC hdc)
+{
+   if (!pngSprites->begin_batch(hdc)) {
+      return;
+   }
+   uint dx_offset = SPRITE_WIDTH  + X_GAP_SZ ;
+   uint dy_offset = SPRITE_HEIGHT + Y_GAP_SZ ;
+   uint ydest = Y_OFFSET ;
+   for (uint row=0; row<TILES_Y; row++) {
+      uint xdest = X_OFFSET ;
+      for (uint col=0; col<TILES_X; col++) {
+         // pngSprites->batch_sprite(hdc, sprite_x(col), sprite_y(row), col, row);
+         pngSprites->batch_sprite(hdc, xdest, ydest, col, row);
+         xdest += dx_offset ;
+      }
+      ydest += dy_offset ;
+   }
+   pngSprites->end_batch();
+}
+
+
+//*****************************************************************
+//  Draw the whole matrix through one shared Graphics object
+//  Used by:
+//     case DrawMode::GdiPlus:
+//     case DrawMode::GdiPlusOffscreen: 
+//*****************************************************************
+static void draw_matrix_gp(Gdiplus::Graphics &graphics)
+{
+   uint dx_offset = SPRITE_WIDTH  + X_GAP_SZ ;
+   uint dy_offset = SPRITE_HEIGHT + Y_GAP_SZ ;
+   uint ydest = Y_OFFSET ;
+   for (uint row=0; row<TILES_Y; row++) {
+      uint xdest = X_OFFSET ;
+      for (uint col=0; col<TILES_X; col++) {
+         pngSprites->draw_sprite_gp(graphics, xdest, ydest, col, row) ;
+         xdest += dx_offset ;
+      }
+      ydest += dy_offset ;
+   }
+}
+
+//*****************************************************************
+//####  case DrawMode::GdiPlus:
+//*****************************************************************
+
+//*****************************************************************
+//  Mode GdiPlus: DrawImage straight to the window
+static void paint_gdiplus(HDC hdc)
+{
+   Gdiplus::Graphics graphics(hdc);
+   gdi_plus::prepare_graphics(graphics);
+   draw_matrix_gp(graphics);
+}
+
+//*****************************************************************
+//####  case DrawMode::GdiPlusOffscreen: 
+//*****************************************************************
+
+//*****************************************************************
 static unsigned sprite_x(unsigned col)
 {
    return X_OFFSET + (col * (SPRITE_WIDTH + X_GAP_SZ)) ;
@@ -88,69 +156,14 @@ static unsigned sprite_y(unsigned row)
 }
 
 //*****************************************************************
-//  Same layout as draw_sprite(), but drawn through a shared Graphics
-static void draw_sprite_gp(Gdiplus::Graphics &graphics, unsigned scol, unsigned srow, unsigned xidest, unsigned yidest)
-{
-   unsigned xdest = X_OFFSET + (xidest * (SPRITE_WIDTH  + X_GAP_SZ)) ;
-   unsigned ydest = Y_OFFSET + (yidest * (SPRITE_HEIGHT + Y_GAP_SZ)) ;
-   pngSprites->draw_sprite_gp(graphics, xdest, ydest, scol, srow) ;
-}
-
-//*****************************************************************
-//  Mode BitBlt: one memory DC created and destroyed per sprite
-static void paint_bitblt(HDC hdc)
-{
-   for (uint row=0; row<TILES_Y; row++) {
-      for (uint col=0; col<TILES_X; col++) {
-         draw_sprite(hdc, col, row, col, row);
-      }
-   }
-}
-
-//*****************************************************************
-//  Mode BatchBlt: one memory DC for the whole matrix
-static void paint_batch(HDC hdc)
-{
-   if (!pngSprites->begin_batch(hdc)) {
-      return;
-   }
-   for (uint row=0; row<TILES_Y; row++) {
-      for (uint col=0; col<TILES_X; col++) {
-         pngSprites->batch_sprite(hdc, sprite_x(col), sprite_y(row), col, row);
-      }
-   }
-   pngSprites->end_batch();
-}
-
-//*****************************************************************
-//  Draw the whole matrix through one shared Graphics object
-static void draw_matrix_gp(Gdiplus::Graphics &graphics)
-{
-   for (uint row=0; row<TILES_Y; row++) {
-      for (uint col=0; col<TILES_X; col++) {
-         draw_sprite_gp(graphics, col, row, col, row);
-      }
-   }
-}
-
-//*****************************************************************
-//  Mode GdiPlus: DrawImage straight to the window
-static void paint_gdiplus(HDC hdc)
-{
-   Gdiplus::Graphics graphics(hdc);
-   gdi_plus::prepare_graphics(graphics);
-   draw_matrix_gp(graphics);
-}
-
-//*****************************************************************
-//  Mode GdiPlusOffscreen: render the matrix into a PARGB bitmap, then
+//  Mode GdiPlusOffscreen: render the matrix into a PRE_ARGB bitmap, then
 //  put it on screen with one DrawImage.  The bitmap is rebuilt on every
 //  paint, so the timing includes the render, not just the final blit.
 static void paint_offscreen(HDC hdc)
 {
    INT const width  = (INT) sprite_x(TILES_X) ;
    INT const height = (INT) sprite_y(TILES_Y) ;
-   Gdiplus::Bitmap canvas(width, height, PixelFormat32bppPARGB);
+   Gdiplus::Bitmap canvas(width, height, PIXFMT_PRE_ARGB);
    {
       //  scoped so the offscreen Graphics is released before canvas is used
       Gdiplus::Graphics offscreen(&canvas);
@@ -180,9 +193,6 @@ static TCHAR image_name[MAX_PATH_LEN+1] = _T("") ;
 
 static LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-   HDC hdc;
-   PAINTSTRUCT ps;
-
    switch (message) {
    case WM_CREATE:
       // tiles32.png: image: 1280x960, tiles: 40x27, sprites: 32x32
@@ -194,7 +204,8 @@ static LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM 
       {
       //  time the paint and show the result in the title bar
       u64 ti = proc_time();
-      hdc = BeginPaint (hwnd, &ps);
+      PAINTSTRUCT ps;
+      HDC hdc = BeginPaint (hwnd, &ps);
       OnPaint(hdc);
       EndPaint (hwnd, &ps);
       u64 ms = (proc_time () - ti) / get_clocks_per_msec () ;
@@ -210,7 +221,14 @@ static LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM 
          draw_mode = next_mode(draw_mode);
          InvalidateRect(hwnd, NULL, TRUE);
       }
+      else if (wParam == ESC) {
+         PostMessage(hwnd, WM_CLOSE, 0, 0);
+      }
       return 0;
+
+   case WM_CLOSE:
+      DestroyWindow(hwnd);
+      break;
 
    case WM_DESTROY:
       PostQuitMessage (0);
